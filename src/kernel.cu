@@ -2,23 +2,50 @@
 #include<chrono>
 #include<iostream>
 
-__device__ void gradient_to_rgb(float gradient, unsigned char* r, unsigned char* g, unsigned char* b) {
-    // hsv to rgb with h being the gradient and v and s fixed
-    float h = gradient;
-    float v = 0.8;
-    float s = 1.0;
-    int i = (int)(h * 6);
-    float f = h * 6 - i;
-    float p = v * (1 - s);
-    float q = v * (1 - f * s);
-    float t = v * (1 - (1 - f) * s);
-    switch (i % 6) {
-        case 0: *r = (unsigned char)(v * 255); *g = (unsigned char)(t * 255); *b = (unsigned char)(p * 255); break;
-        case 1: *r = (unsigned char)(q * 255); *g = (unsigned char)(v * 255); *b = (unsigned char)(p * 255); break;
-        case 2: *r = (unsigned char)(p * 255); *g = (unsigned char)(v * 255); *b = (unsigned char)(t * 255); break;
-        case 3: *r = (unsigned char)(p * 255); *g = (unsigned char)(q * 255); *b = (unsigned char)(v * 255); break;
-        case 4: *r = (unsigned char)(t * 255); *g = (unsigned char)(p * 255); *b = (unsigned char)(v * 255); break;
-        case 5: *r = (unsigned char)(v * 255); *g = (unsigned char)(p * 255); *b = (unsigned char)(q * 255); break;
+__device__ void gradient_to_rgb(float gradient, uint8_t* r, uint8_t* g, uint8_t* b) {
+    // related to https://stackoverflow.com/a/6930407 but with v and s set to 1
+    double hh, p, q, t, ff;
+    int i;
+
+    hh = gradient * 6;
+    i = (int)hh;
+    ff = hh - i;
+    p = 0;
+    q = 1.0 - ff;
+    t = ff;
+
+    switch(i) {
+    case 0:
+        *r = (uint8_t) 255;
+        *g = (uint8_t) t*255;
+        *b = (uint8_t) p*255;
+        break;
+    case 1:
+        *r = (uint8_t) q*255;
+        *g = (uint8_t) 255;
+        *b = (uint8_t) p*255;
+        break;
+    case 2:
+        *r = (uint8_t) p*255;
+        *g = (uint8_t) 255;
+        *b = (uint8_t) t*255;
+        break;
+    case 3:
+        *r = (uint8_t) p*255;
+        *g = (uint8_t) q*255;
+        *b = (uint8_t) 255;
+        break;
+    case 4:
+        *r = (uint8_t) t*255;
+        *g = (uint8_t) p*255;
+        *b = (uint8_t) 255;
+        break;
+    case 5:
+    default:
+        *r = (uint8_t) 255;
+        *g = (uint8_t) p*255;
+        *b = (uint8_t) q*255;
+        break;
     }
 }
 
@@ -48,7 +75,7 @@ __global__ void mandelbrot(uint32_t *pixels, int width, int height, float resolu
     }
     // not in mandelbrot set
     else {
-        unsigned char r, g, b;
+        uint8_t r, g, b;
         float gradient = ((float) n) / numberOfIterations;
         gradient_to_rgb(gradient, &r, &g, &b);
         // convert rgb to one 32b uint
