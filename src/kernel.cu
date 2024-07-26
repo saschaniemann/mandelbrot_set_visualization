@@ -1,4 +1,6 @@
 #include "kernel.cuh"
+#include<chrono>
+#include<iostream>
 
 __device__ void gradient_to_rgb(float gradient, unsigned char* r, unsigned char* g, unsigned char* b) {
     // hsv to rgb with h being the gradient and v and s fixed
@@ -41,14 +43,14 @@ __global__ void mandelbrot(uint32_t *pixels, int width, int height, float resolu
     }
     // not in mandelbrot set
     if(n == numberOfIterations) {
-        pixels[thread_id] = 0x0;
+        pixels[thread_id] = 0xff000000;
     }
     else {
         unsigned char r, g, b;
         float gradient = ((float) n) / numberOfIterations;
         gradient_to_rgb(gradient, &r, &g, &b);
 
-        pixels[thread_id] = r << 16 | g << 8 | b;
+        pixels[thread_id] = r << 16 | g << 8 | b | 0xff000000;
     }
 }
 
@@ -67,12 +69,20 @@ void call_kernel(uint32_t *pixels, int width, int height, float resolution, floa
     // run mandelbrot kernel
     int threadsPerBlock = 256;
     int numberOfBlocks = ((width*height + threadsPerBlock -1) / threadsPerBlock);
-    std::cout << "blockSize: " << threadsPerBlock << ", numberOfBlocks: " << numberOfBlocks << std::endl;
+
+    std::chrono::steady_clock::time_point beginKernel = std::chrono::steady_clock::now();
     mandelbrot<<<numberOfBlocks, threadsPerBlock>>>(pixelsGPU, width, height, resolution, offsetX, offsetY, 250);
 
     // wait for GPU to finish and copy from GPU to CPU
     cudaDeviceSynchronize();
+    std::chrono::steady_clock::time_point endKernel = std::chrono::steady_clock::now();
+    std::cout << "Time for running kernel: " << std::chrono::duration_cast<std::chrono::milliseconds>(endKernel - beginKernel).count() << "[ms]" << std::endl;
+
+
+    std::chrono::steady_clock::time_point beginCpyToHost = std::chrono::steady_clock::now();
     cudaMemcpy(pixels, pixelsGPU, size, cudaMemcpyDeviceToHost);
+    std::chrono::steady_clock::time_point endCpyToHost = std::chrono::steady_clock::now();
+    std::cout << "Time for copy to host: " << std::chrono::duration_cast<std::chrono::milliseconds>(endCpyToHost - beginCpyToHost).count() << "[ms]" << std::endl;
 
     cudaFree(pixelsGPU);
 }

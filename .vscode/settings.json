@@ -56,6 +56,8 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "__nullptr": "cpp"
+        "__nullptr": "cpp",
+        "list": "cpp",
+        "numeric": "cpp"
     }
 }
