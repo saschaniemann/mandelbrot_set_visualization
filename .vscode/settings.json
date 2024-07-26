@@ -58,6 +58,7 @@
         "typeinfo": "cpp",
         "__nullptr": "cpp",
         "list": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "qpixmap": "cpp"
     }
 }

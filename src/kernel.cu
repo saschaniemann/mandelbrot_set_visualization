@@ -33,34 +33,33 @@ __global__ void mandelbrot(uint32_t *pixels, int width, int height, float resolu
     float y = img;
     int n;
     for(n = 0; n < numberOfIterations; n++) {
+        // (x, y) = (x^2−y^2−real, 2xy−img)
         tx = x;
         x = x*x - y*y - real;
         y = 2*tx*y - img;
-        // (x2−y2−a, 2xy−b)
+        // if leaving circle with r=2, c=(0,0): break
         if(sqrt(x*x+y*y) > 2) {
             break;
         }
     }
-    // not in mandelbrot set
+    // in mandelbrot set
     if(n == numberOfIterations) {
         pixels[thread_id] = 0xff000000;
     }
+    // not in mandelbrot set
     else {
         unsigned char r, g, b;
         float gradient = ((float) n) / numberOfIterations;
         gradient_to_rgb(gradient, &r, &g, &b);
-
+        // convert rgb to one 32b uint
         pixels[thread_id] = r << 16 | g << 8 | b | 0xff000000;
     }
 }
 
 void call_kernel(uint32_t *pixels, int width, int height, float resolution, float offsetX, float offsetY){
-    // Declare Vektors on Host and Device
-    uint32_t *pixelsGPU; 
-
     // Allocate memory.
+    uint32_t *pixelsGPU; 
     int size = sizeof(uint32_t) * width * height;
-    
     cudaMalloc(&pixelsGPU, size);
 
     // copy from CPU to GPU

@@ -2,7 +2,7 @@
 #define TEXTUREWIDGET_H
 
 #include <QWidget>
-#include <QImage>
+#include <QPixmap>
 
 class TextureWidget : public QWidget
 {
@@ -19,7 +19,7 @@ class TextureWidget : public QWidget
         void updateImage();
 
         uint32_t *pixels;
-        QImage image;
+        QPixmap pixmap;
         int width;
         int height;
         float offsetX;
