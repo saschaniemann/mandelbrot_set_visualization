@@ -95,20 +95,10 @@ void call_kernel(uint32_t *pixels, int width, int height, float resolution, floa
     // run mandelbrot kernel
     int threadsPerBlock = 256;
     int numberOfBlocks = ((width*height + threadsPerBlock -1) / threadsPerBlock);
-
-    std::chrono::steady_clock::time_point beginKernel = std::chrono::steady_clock::now();
     mandelbrot<<<numberOfBlocks, threadsPerBlock>>>(pixelsGPU, width, height, resolution, offsetX, offsetY, 250);
 
     // wait for GPU to finish and copy from GPU to CPU
     cudaDeviceSynchronize();
-    std::chrono::steady_clock::time_point endKernel = std::chrono::steady_clock::now();
-    std::cout << "Time for running kernel: " << std::chrono::duration_cast<std::chrono::milliseconds>(endKernel - beginKernel).count() << "[ms]" << std::endl;
-
-
-    std::chrono::steady_clock::time_point beginCpyToHost = std::chrono::steady_clock::now();
     cudaMemcpy(pixels, pixelsGPU, size, cudaMemcpyDeviceToHost);
-    std::chrono::steady_clock::time_point endCpyToHost = std::chrono::steady_clock::now();
-    std::cout << "Time for copy to host: " << std::chrono::duration_cast<std::chrono::milliseconds>(endCpyToHost - beginCpyToHost).count() << "[ms]" << std::endl;
-
     cudaFree(pixelsGPU);
 }

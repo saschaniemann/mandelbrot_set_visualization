@@ -55,23 +55,15 @@ void TextureWidget::keyPressEvent(QKeyEvent *event)
     }
     if(keyDown) {
         updateImage();
-        std::chrono::steady_clock::time_point beginCallUpdate = std::chrono::steady_clock::now();
         update();
-        std::chrono::steady_clock::time_point endCallUpdate = std::chrono::steady_clock::now();
-        std::cout << "Time for updating image: " << std::chrono::duration_cast<std::chrono::milliseconds>(endCallUpdate - beginCallUpdate).count() << "[ms]" << std::endl;
     }
     QWidget::keyPressEvent(event); 
 }
 
 void TextureWidget::updateImage()
 {
-    std::chrono::steady_clock::time_point beginCallKernel = std::chrono::steady_clock::now();
     call_kernel(pixels, width, height, resolution, offsetX, offsetY);
-    std::chrono::steady_clock::time_point endCallKernel = std::chrono::steady_clock::now();
-    std::cout << "Time for running call_kernel: " << std::chrono::duration_cast<std::chrono::milliseconds>(endCallKernel - beginCallKernel).count() << "[ms]" << std::endl;
 
     QImage image = QImage(reinterpret_cast<uchar*>(pixels), width, height, QImage::Format_ARGB32);
     pixmap = QPixmap::fromImage(image);
-    endCallKernel = std::chrono::steady_clock::now();
-    std::cout << "Time for running updateImage(): " << std::chrono::duration_cast<std::chrono::milliseconds>(endCallKernel - beginCallKernel).count() << "[ms]" << std::endl;
 }
