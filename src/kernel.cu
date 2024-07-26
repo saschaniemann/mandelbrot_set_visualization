@@ -64,16 +64,15 @@ void call_kernel(uint32_t *pixels, int width, int height, float resolution, floa
     // copy from CPU to GPU
     cudaMemcpy(pixelsGPU, pixels, size, cudaMemcpyHostToDevice);
 
-    int threadsPerBlock = 128;
+    // run mandelbrot kernel
+    int threadsPerBlock = 256;
     int numberOfBlocks = ((width*height + threadsPerBlock -1) / threadsPerBlock);
     std::cout << "blockSize: " << threadsPerBlock << ", numberOfBlocks: " << numberOfBlocks << std::endl;
     mandelbrot<<<numberOfBlocks, threadsPerBlock>>>(pixelsGPU, width, height, resolution, offsetX, offsetY, 250);
-    // std::cout << pi << std::endl;
 
+    // wait for GPU to finish and copy from GPU to CPU
     cudaDeviceSynchronize();
-    // copy from GPU to CPU
     cudaMemcpy(pixels, pixelsGPU, size, cudaMemcpyDeviceToHost);
-    std::cout << pixels[800*150 + 200] << std::endl;
 
     cudaFree(pixelsGPU);
 }
