@@ -4,7 +4,7 @@
 The Mandelbrot Set is a mathematical set. Its definition can be seen [here](https://en.wikipedia.org/wiki/Mandelbrot_set). 
 
 ## Requirements
-We use Qt5 for the GUI.
+We use Qt5 for the GUI and CUDA for mandelbrot acceleration. We ran this code on a Jetson Nano.
 
 ## Installation and build
 Install Qt5 (`sudo apt-get install qt5-default`). Use CMake to build the project as follows:
