@@ -1,6 +1,6 @@
 # Mandelbrot Set Visualization
-<!-- ![mandelbrot](https://github.com/user-attachments/assets/14c8b2fd-d206-42ff-9e8a-4276c700f075) -->
-<img src="https://github.com/user-attachments/assets/14c8b2fd-d206-42ff-9e8a-4276c700f075" width="800" height="600" /> \
+![mandelbrot](https://github.com/user-attachments/assets/14c8b2fd-d206-42ff-9e8a-4276c700f075) 
+\
 The Mandelbrot Set is a mathematical set. Its definition can be seen [here](https://en.wikipedia.org/wiki/Mandelbrot_set). 
 
 ## Requirements
